@@ -22,11 +22,10 @@ while running:
             data = 'test'
             msg = 'test'
             data = conn.recv(1024)
-            print data
-            while "\n" in data:
-                msg, data = data.split("\n", 1)
-                jsonObject = json.loads(msg)
-                print jsonObject["speed_up"]
+#            while "\n" in data:
+#                msg, data = data.split("\n", 1)
+            jsonObject = json.loads(data)
+            print jsonObject["speed_up"]
 
         except ValueError:
             pass
@@ -52,3 +51,14 @@ while running:
     server.close()
 print "shutdown"
 sys.exit()
+# if char == curses.KEY_UP:
+# sm = min(100, sm + 5)
+# stm.set_motors([sm, sm, sm, sm])
+
+
+
+#while True:
+# if "\n" in a:
+# msg, a = a.split("\n", 1)
+# doe_iets_met_msg(msg)
+# a += socket.read()
