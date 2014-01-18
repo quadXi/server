@@ -1,0 +1,55 @@
+#! /usr/bin/sudo /usr/bin/python2.7
+import time
+import math
+import stm
+import SocketServer
+import json
+
+server = None
+
+class EchoRequestHandler(SocketServer.BaseRequestHandler):
+    def setup(self):
+        print self.client_address, 'connected'
+        #self.request.send('hi ' + str(self.client_address) + '\n')
+
+    def handle(self):
+        data = 'test'
+        msg = 'test'
+        while msg:
+            data = self.request.recv(1024)
+            while "\n" in data:
+                msg, data = data.split("\n", 1)
+                jsonObject = json.loads(msg)
+                print jsonObject["speed_up"]
+
+                if msg.strip() == 'bye':
+                    return
+
+    def finish(self):
+        print self.client_address, 'disconnected'
+        #self.request.send('bye ' + str(self.client_address) + '\n')
+
+with stm.stm_device() as stm:
+    stm.enable_motors()
+    sm = 0
+    stm.set_motors([sm, sm, sm, sm])
+    print "yolo7"
+    server = SocketServer.ThreadingTCPServer(('', 9996), EchoRequestHandler)
+    print "yolo8"
+    #server.serve_forever()
+    
+    try:
+        server.handle_request()
+    except KeyboardInterrupt: pass
+
+#        if char == curses.KEY_UP:
+#           sm = min(100, sm + 5)
+#            stm.set_motors([sm, sm, sm, sm])
+
+
+
+#while True:
+#   if "\n" in a:
+#       msg, a = a.split("\n", 1)
+#       doe_iets_met_msg(msg)
+#   a += socket.read()
