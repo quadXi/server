@@ -2,54 +2,53 @@
 import time
 import math
 import stm
-import SocketServer
+import socket
+import sys
 import json
 
-server = None
+running = True
+while running:
+    print "start"
+    connected = True
+    server = socket.socket()
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
+    server.bind(('0.0.0.0', 50001))
+    server.listen(1)
+    conn, addr = server.accept()
+    print 'Connection established'
 
-class EchoRequestHandler(SocketServer.BaseRequestHandler):
-    def setup(self):
-        print self.client_address, 'connected'
-        #self.request.send('hi ' + str(self.client_address) + '\n')
-
-    def handle(self):
-        data = 'test'
-        msg = 'test'
-        while msg:
-            data = self.request.recv(1024)
+    while connected:
+        try:
+            data = 'test'
+            msg = 'test'
+            data = conn.recv(1024)
+            print data
             while "\n" in data:
                 msg, data = data.split("\n", 1)
                 jsonObject = json.loads(msg)
                 print jsonObject["speed_up"]
 
-                if msg.strip() == 'bye':
-                    return
+        except ValueError:
+            pass
 
-    def finish(self):
-        print self.client_address, 'disconnected'
-        #self.request.send('bye ' + str(self.client_address) + '\n')
-
-with stm.stm_device() as stm:
-    stm.enable_motors()
-    sm = 0
-    stm.set_motors([sm, sm, sm, sm])
-    print "yolo7"
-    server = SocketServer.ThreadingTCPServer(('', 9996), EchoRequestHandler)
-    print "yolo8"
-    #server.serve_forever()
-    
-    try:
-        server.handle_request()
-    except KeyboardInterrupt: pass
-
-#        if char == curses.KEY_UP:
-#           sm = min(100, sm + 5)
-#            stm.set_motors([sm, sm, sm, sm])
-
-
-
-#while True:
-#   if "\n" in a:
-#       msg, a = a.split("\n", 1)
-#       doe_iets_met_msg(msg)
-#   a += socket.read()
+        except KeyboardInterrupt:
+            print "test"
+            conn.close()
+            connected = False
+            running = False
+            print "close1"
+        else:
+            if data:
+                print data
+                running = True
+                connected = True
+            else:
+                conn.close()
+                connected = False
+                running = True
+                print "close2"
+    print "end"
+    server.shutdown(socket.SHUT_RDWR) 
+    server.close()
+print "shutdown"
+sys.exit()
