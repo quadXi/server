@@ -24,8 +24,11 @@ while running:
             data = conn.recv(1024)
 #            while "\n" in data:
 #                msg, data = data.split("\n", 1)
-            jsonObject = json.loads(data)
-            print jsonObject["speed_up"]
+            if data == "ping\n":
+                conn.send("pong")
+            else:
+                jsonObject = json.loads(data)
+                print jsonObject["speed_up"]
 
         except ValueError:
             pass
